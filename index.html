@@ -918,6 +918,17 @@
         </div>
     </footer>
 
+    <!-- Music Player Controls -->
+    <div id="music-player" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 10px; z-index: 1000;">
+        <button id="play-pause-btn">⏸️ Pause</button>
+        <button id="next-btn">⏭️ Next</button>
+        <span id="current-song">Song 1</span>
+    </div>
+
+    <audio id="bg-music" autoplay muted>
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
     <script>
         // Script sederhana untuk tombol menu mobile
         const menuToggle = document.getElementById('mobile-menu');
@@ -944,6 +955,69 @@
 
         // Auto slide setiap 5 detik
         setInterval(nextSlide, 5000);
+
+        // Script untuk musik latar belakang dan player controls
+        const bgMusic = document.getElementById('bg-music');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentSongSpan = document.getElementById('current-song');
+
+        const playlist = [
+            'musik/DJ BLOODLINE JEDAG JEDUG REVERB FULL BEAT _ DJ KOMANG RIMEX VIRAL TIK TOK YANG KALIAN CARI CARI [8wE7AEmRr8U].mp3',
+            'musik/DJ BLOODLINE JEDAG JEDUG REVERB FULL BEAT DJ KOMANG RIMEX VIRAL TIK TOK YANG KALIAN CARI CARI [sOJqDY2Eppk].mp3',
+            'musik/I Don’t Know Why (Mister Aloy Edit) [t7XyAq3M3DE].mp3',
+            'musik/Viral tiktok 2025 Bloodline - DJ Komang Remix [3Cu0ocI_Ofs].mp3'
+        ];
+
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let hasStarted = false;
+
+        function loadSong(index) {
+            bgMusic.src = playlist[index];
+            currentSongSpan.textContent = playlist[index].split('/').pop().split(' [')[0]; // Extract song name
+        }
+
+        function playNextSong() {
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            loadSong(currentSongIndex);
+            bgMusic.play();
+            isPlaying = true;
+            playPauseBtn.textContent = '⏸️ Pause';
+        }
+
+        // Fungsi untuk memulai musik setelah interaksi pengguna (untuk mengatasi kebijakan autoplay browser)
+        function startMusic() {
+            if (!hasStarted) {
+                loadSong(currentSongIndex);
+                bgMusic.muted = false;
+                bgMusic.play();
+                isPlaying = true;
+                hasStarted = true;
+                playPauseBtn.textContent = '⏸️ Pause';
+                document.removeEventListener('click', startMusic);
+            }
+        }
+
+        document.addEventListener('click', startMusic);
+
+        // Play/Pause functionality
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                bgMusic.pause();
+                playPauseBtn.textContent = '▶️ Play';
+            } else {
+                bgMusic.play();
+                playPauseBtn.textContent = '⏸️ Pause';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Next song
+        nextBtn.addEventListener('click', playNextSong);
+
+        // Update play state when music ends
+        bgMusic.addEventListener('ended', playNextSong);
     </script>
 
 </body>
